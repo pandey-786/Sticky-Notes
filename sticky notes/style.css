@@ -1,0 +1,204 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --toolbar-h: 56px;
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --bg: #f0ede8;
+  --toolbar-bg: #1a1a1a;
+  --toolbar-text: #f5f5f5;
+  --note-radius: 2px;
+  --shadow: 0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+  --shadow-drag: 0 16px 40px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.14);
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--toolbar-h);
+  background: var(--toolbar-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  gap: 16px;
+}
+
+.toolbar-left { display: flex; align-items: center; gap: 20px; }
+.toolbar-right { display: flex; align-items: center; gap: 10px; }
+
+.app-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--toolbar-text);
+  text-transform: uppercase;
+}
+
+.color-picker { display: flex; align-items: center; gap: 6px; }
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  outline: none;
+}
+.color-swatch:hover { transform: scale(1.2); }
+.color-swatch.active {
+  border-color: #fff;
+  transform: scale(1.2);
+}
+
+.btn-add, .btn-clear {
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-add:hover, .btn-clear:hover { opacity: 0.85; }
+.btn-add:active, .btn-clear:active { transform: scale(0.97); }
+
+.btn-add {
+  background: #fff;
+  color: #1a1a1a;
+}
+.btn-clear {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #444;
+}
+.btn-clear:hover { color: #ff6b6b; border-color: #ff6b6b; opacity: 1; }
+
+/* ── Board ── */
+.board {
+  position: fixed;
+  top: var(--toolbar-h);
+  left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 14px; color: #999; }
+.empty-state p strong { color: #777; }
+.empty-state.hidden { opacity: 0; }
+
+/* ── Notes ── */
+.note {
+  position: absolute;
+  width: 200px;
+  min-height: 160px;
+  border-radius: var(--note-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s, transform 0.15s;
+  cursor: grab;
+}
+.note:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.1); }
+.note.dragging {
+  box-shadow: var(--shadow-drag);
+  transform: rotate(2deg) scale(1.03);
+  cursor: grabbing;
+  z-index: 999 !important;
+}
+.note.resizing { cursor: se-resize; }
+
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 6px 8px 4px;
+  flex-shrink: 0;
+}
+
+.note-delete {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.45);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+.note:hover .note-delete { opacity: 1; }
+.note-delete:hover { background: rgba(0,0,0,0.2); color: rgba(0,0,0,0.7); }
+
+.note-text {
+  flex: 1;
+  padding: 2px 12px 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(0,0,0,0.72);
+  outline: none;
+  word-break: break-word;
+  white-space: pre-wrap;
+  cursor: text;
+  min-height: 80px;
+}
+.note-text:empty::before {
+  content: 'Write something...';
+  color: rgba(0,0,0,0.28);
+}
+
+.note-footer {
+  padding: 4px 8px 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.note-resize-handle {
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  background-image:
+    linear-gradient(135deg,
+      transparent 30%,
+      rgba(0,0,0,0.25) 30%, rgba(0,0,0,0.25) 40%,
+      transparent 40%, transparent 55%,
+      rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.25) 65%,
+      transparent 65%, transparent 80%,
+      rgba(0,0,0,0.25) 80%, rgba(0,0,0,0.25) 90%,
+      transparent 90%
+    );
+}
+.note:hover .note-resize-handle { opacity: 1; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 0; }

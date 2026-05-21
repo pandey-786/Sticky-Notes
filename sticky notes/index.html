@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sticky Notes Board</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="toolbar">
+  <div class="toolbar-left">
+    <span class="app-title">Board</span>
+    <div class="color-picker" id="colorPicker">
+      <button class="color-swatch active" data-color="#FDE68A" style="background:#FDE68A" title="Yellow"></button>
+      <button class="color-swatch" data-color="#A7F3D0" style="background:#A7F3D0" title="Mint"></button>
+      <button class="color-swatch" data-color="#BAE6FD" style="background:#BAE6FD" title="Sky"></button>
+      <button class="color-swatch" data-color="#FBCFE8" style="background:#FBCFE8" title="Pink"></button>
+      <button class="color-swatch" data-color="#DDD6FE" style="background:#DDD6FE" title="Lavender"></button>
+      <button class="color-swatch" data-color="#FED7AA" style="background:#FED7AA" title="Peach"></button>
+    </div>
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-add" id="btnAdd">+ Add Note</button>
+    <button class="btn-clear" id="btnClear">Clear All</button>
+  </div>
+</header>
+
+<div class="board" id="board"></div>
+
+<div class="empty-state" id="emptyState">
+  <div class="empty-icon">📋</div>
+  <p>Click <strong>+ Add Note</strong> to get started</p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
