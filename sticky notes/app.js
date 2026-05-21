@@ -1,18 +1,17 @@
-'use strict';
+ 
 
-// ── State ──────────────────────────────────────────────────────────────────
+ 
 const STORAGE_KEY = 'sticky-notes-board';
 let notes = [];
 let selectedColor = '#FDE68A';
 let topZ = 10;
-
-// Drag state
+ 
 let drag = { active: false, noteEl: null, noteId: null, offX: 0, offY: 0 };
 
-// Resize state
+ 
 let resize = { active: false, noteEl: null, noteId: null, startX: 0, startY: 0, startW: 0, startH: 0 };
 
-// ── Persistence ────────────────────────────────────────────────────────────
+ 
 function saveNotes() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
 }
@@ -26,7 +25,7 @@ function loadNotes() {
   }
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+ 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
@@ -54,7 +53,7 @@ function updateEmptyState() {
   el.classList.toggle('hidden', notes.length > 0);
 }
 
-// ── Create a note DOM element ──────────────────────────────────────────────
+ 
 function createNoteEl(note) {
   const el = document.createElement('div');
   el.className = 'note';
@@ -68,7 +67,7 @@ function createNoteEl(note) {
     z-index: ${note.z};
   `;
 
-  // Header (delete button)
+ 
   const header = document.createElement('div');
   header.className = 'note-header';
 
@@ -82,7 +81,7 @@ function createNoteEl(note) {
   });
   header.appendChild(delBtn);
 
-  // Text area
+ 
   const text = document.createElement('div');
   text.className = 'note-text';
   text.contentEditable = 'true';
@@ -94,10 +93,10 @@ function createNoteEl(note) {
     if (n) { n.text = text.textContent; saveNotes(); }
   });
 
-  // Prevent drag from starting on text
+ 
   text.addEventListener('mousedown', e => e.stopPropagation());
 
-  // Footer (resize handle)
+ 
   const footer = document.createElement('div');
   footer.className = 'note-footer';
 
@@ -110,7 +109,7 @@ function createNoteEl(note) {
   el.appendChild(text);
   el.appendChild(footer);
 
-  // ── Drag (mousedown on note, not text/buttons) ──
+ 
   el.addEventListener('mousedown', e => {
     if (e.target === delBtn || e.target === handle) return;
     e.preventDefault();
@@ -123,7 +122,7 @@ function createNoteEl(note) {
     el.classList.add('dragging');
   });
 
-  // ── Resize (mousedown on handle) ──
+ 
   handle.addEventListener('mousedown', e => {
     e.preventDefault();
     e.stopPropagation();
@@ -140,8 +139,7 @@ function createNoteEl(note) {
 
   return el;
 }
-
-// ── Render ─────────────────────────────────────────────────────────────────
+ 
 function renderBoard() {
   const board = document.getElementById('board');
   board.innerHTML = '';
@@ -151,7 +149,7 @@ function renderBoard() {
   updateEmptyState();
 }
 
-// ── Actions ────────────────────────────────────────────────────────────────
+ 
 function addNote() {
   const pos = randomPos();
   const note = {
@@ -171,7 +169,7 @@ function addNote() {
   document.getElementById('board').appendChild(el);
   updateEmptyState();
 
-  // Focus text immediately
+ 
   setTimeout(() => {
     const textEl = el.querySelector('.note-text');
     if (textEl) textEl.focus();
@@ -204,7 +202,7 @@ function clearAll() {
   renderBoard();
 }
 
-// ── Global mouse events ────────────────────────────────────────────────────
+ 
 window.addEventListener('mousemove', e => {
   if (drag.active) {
     const board = document.getElementById('board');
@@ -258,7 +256,7 @@ window.addEventListener('mouseup', () => {
   }
 });
 
-// ── Keyboard shortcut ──────────────────────────────────────────────────────
+ 
 window.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
     e.preventDefault();
@@ -266,7 +264,7 @@ window.addEventListener('keydown', e => {
   }
 });
 
-// ── Colour picker ──────────────────────────────────────────────────────────
+ 
 document.getElementById('colorPicker').addEventListener('click', e => {
   const swatch = e.target.closest('.color-swatch');
   if (!swatch) return;
@@ -275,11 +273,10 @@ document.getElementById('colorPicker').addEventListener('click', e => {
   selectedColor = swatch.dataset.color;
 });
 
-// ── Toolbar buttons ────────────────────────────────────────────────────────
+ 
 document.getElementById('btnAdd').addEventListener('click', addNote);
 document.getElementById('btnClear').addEventListener('click', clearAll);
-
-// ── Init ───────────────────────────────────────────────────────────────────
+ 
 loadNotes();
 if (notes.length > 0) {
   topZ = Math.max(...notes.map(n => n.z || 10));
